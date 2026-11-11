@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Scholar's Circle — Study Group Portal</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Quicksand -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Quicksand', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+                    },
+                    colors: {
+                        cream: {
+                            DEFAULT: '#EFE0C2',
+                            light: '#F7EBD4',
+                            dark: '#E2CCA2',
+                        },
+                        navy: {
+                            DEFAULT: '#101622',
+                            light: '#192231',
+                            dark: '#0A0E17',
+                        },
+                        gold: {
+                            DEFAULT: '#D4A034',
+                            light: '#F0C768',
+                            dark: '#9E7115',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        html, body {
+            font-family: 'Quicksand', sans-serif;
+        }
+        /* Intro Animation Keyframes */
+        @keyframes drawCircle {
+            0% { stroke-dasharray: 0 1000; }
+            100% { stroke-dasharray: 1000 1000; }
+        }
+        @keyframes revealLogo {
+            0% { opacity: 0; filter: blur(10px); transform: scale(0.8); }
+            100% { opacity: 1; filter: blur(0); transform: scale(1); }
+        }
+        @keyframes fadeOut {
+            0% { opacity: 1; visibility: visible; }
+            100% { opacity: 0; visibility: hidden; pointer-events: none; }
+        }
+
+        .animate-draw-circle {
+            animation: drawCircle 1.5s ease-out forwards;
+        }
+        .animate-reveal-logo {
+            animation: revealLogo 1.5s ease-out 1s forwards;
+            opacity: 0;
+        }
+        .animate-fade-out {
+            animation: fadeOut 0.5s ease-out 3.3s forwards;
+        }
+
+        .bg-noise {
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+        }
+        
+        .global-texture {
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E");
+            pointer-events: none;
+        }
+
+        .bg-plus-pattern {
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23D4A034' fill-opacity='0.14'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .bg-dot-pattern {
+            background-image: radial-gradient(rgba(212, 160, 52, 0.32) 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+        }
+        .dark .bg-dot-pattern {
+            background-image: radial-gradient(rgba(212, 160, 52, 0.16) 1.5px, transparent 1.5px);
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #E2CCA2;
+        }
+        .dark ::-webkit-scrollbar-track {
+            background: #0A0E17;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #F0C768, #D4A034, #9E7115);
+            border-radius: 4px;
+        }
+
+        .gold-glow {
+            box-shadow: 0 8px 30px -4px rgba(212, 160, 52, 0.25), 0 0 15px -3px rgba(212, 160, 52, 0.15);
+        }
+        .card-aesthetic {
+            backdrop-filter: blur(8px);
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .card-aesthetic:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 14px 35px -5px rgba(212, 160, 52, 0.38);
+        }
+    </style>
+</head>
+<body class="bg-cream dark:bg-navy text-navy dark:text-cream font-sans antialiased selection:bg-gold selection:text-navy bg-dot-pattern relative min-h-screen transition-colors duration-300">
+
+    <!-- Global Texture Overlay -->
+    <div class="fixed inset-0 z-0 global-texture opacity-100 dark:opacity-25 pointer-events-none"></div>
+    <div class="fixed inset-0 z-0 bg-plus-pattern opacity-70 dark:opacity-30 pointer-events-none"></div>
+
+    <!-- INTRO ANIMATION SCREEN -->
+    <div id="intro-screen" class="fixed inset-0 z-[100] flex items-center justify-center bg-cream dark:bg-navy bg-noise animate-fade-out">
+        <div class="relative w-64 h-64 md:w-80 md:h-80 flex items-center justify-center">
+            <!-- Animated SVG Stroke -->
+            <svg class="absolute inset-0 w-full h-full text-navy dark:text-gold transform -rotate-90" viewBox="0 0 100 100">
+                <circle class="animate-draw-circle" cx="50" cy="50" r="48" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+            </svg>
+            <!-- Logo Reveal -->
+            <div class="w-[88%] h-[88%] rounded-full bg-navy flex items-center justify-center text-gold font-bold text-4xl shadow-2xl border-4 border-gold animate-reveal-logo overflow-hidden relative">
+                <img src="logo.jpg" alt="The Scholar's Circle Logo" class="w-full h-full rounded-full object-cover relative z-10" onerror="this.src='https://placehold.co/300x300/101622/D4A034?text=SC';">
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Metallic Gold Accent Strip -->
+    <div class="h-1.5 w-full bg-gradient-to-r from-gold-dark via-gold-light to-gold-dark relative z-50"></div>
+
+    <!-- Sticky Navigation Bar -->
+    <nav class="sticky top-0 z-50 backdrop-blur-md bg-cream/95 dark:bg-navy/95 border-b-2 border-gold transition-all duration-300 gold-glow">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <!-- Brand Logo & Name -->
+            <a href="#" class="flex items-center space-x-3 group">
+                <div class="w-10 h-10 rounded-full bg-navy flex items-center justify-center text-gold shadow-md group-hover:scale-105 transition-transform overflow-hidden border-2 border-gold ring-2 ring-gold/30 relative">
+                    <img src="logo.jpg" alt="Logo" class="w-full h-full object-cover rounded-full relative z-10" onerror="this.src='https://placehold.co/100x100/101622/D4A034?text=SC';">
+                </div>
+                <div class="flex flex-col">
+                    <span class="font-bold text-navy dark:text-cream tracking-tight text-base sm:text-lg">The Scholar's Circle</span>
+                    <span class="text-xs text-gold-dark dark:text-gold font-bold flex items-center gap-1">
+                        <i class="fa-solid fa-star text-[9px] text-gold"></i> Est. 20/10/2026
+                    </span>
+                </div>
+            </a>
+
+            <!-- Desktop Nav Jump Links -->
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="#about" class="text-sm font-bold text-navy/90 dark:text-cream/90 hover:text-gold-dark dark:hover:text-gold transition-colors">About</a>
+                <a href="#captain" class="text-sm font-bold text-navy/90 dark:text-cream/90 hover:text-gold-dark dark:hover:text-gold transition-colors">Leadership Desks</a>
+                <a href="#members" class="text-sm font-bold text-navy/90 dark:text-cream/90 hover:text-gold-dark dark:hover:text-gold transition-colors">Members Board</a>
+                <a href="#contact" class="text-sm font-bold text-navy/90 dark:text-cream/90 hover:text-gold-dark dark:hover:text-gold transition-colors">Connect</a>
+            </div>
+
+            <!-- Action Buttons & Theme Toggle -->
+            <div class="hidden sm:flex items-center space-x-3">
+                <button id="theme-toggle" class="p-2.5 rounded-xl bg-gold/25 dark:bg-gold/20 text-navy dark:text-gold hover:bg-gold/40 dark:hover:bg-gold/30 border-2 border-gold transition-colors shadow-sm" aria-label="Toggle Theme">
+                    <i id="theme-icon" class="fa-solid fa-moon"></i>
+                </button>
+                <a href="https://chat.whatsapp.com/KqzwHRj7e3hBOY02vjfV3m" target="_blank" rel="noopener noreferrer" class="px-4 py-2 text-sm font-bold text-gold-light bg-navy rounded-xl shadow-md hover:bg-navy-light transition-all hover:shadow-lg border-2 border-gold">
+                    <i class="fa-solid fa-sparkles text-gold mr-1"></i> Join GC
+                </a>
+            </div>
+
+            <!-- Mobile Right Controls -->
+            <div class="flex items-center space-x-2 md:hidden">
+                <button id="theme-toggle-mobile" class="p-2 rounded-lg text-navy dark:text-gold border border-gold/60 bg-gold/20 hover:bg-gold/30" aria-label="Toggle Theme">
+                    <i id="theme-icon-mobile" class="fa-solid fa-moon"></i>
+                </button>
+                <button id="mobile-menu-btn" class="p-2 rounded-lg text-navy dark:text-cream border border-gold/60 bg-gold/15 hover:bg-gold/30 focus:outline-none" aria-label="Toggle menu">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobile-menu" class="hidden md:hidden bg-cream-light dark:bg-navy border-b-2 border-gold px-4 pt-2 pb-4 space-y-2">
+            <a href="#about" class="block px-3 py-2 rounded-lg text-base font-bold text-navy dark:text-cream hover:bg-gold/25">About</a>
+            <a href="#captain" class="block px-3 py-2 rounded-lg text-base font-bold text-navy dark:text-cream hover:bg-gold/25">Leadership Desks</a>
+            <a href="#members" class="block px-3 py-2 rounded-lg text-base font-bold text-navy dark:text-cream hover:bg-gold/25">Members Board</a>
+            <a href="#contact" class="block px-3 py-2 rounded-lg text-base font-bold text-navy dark:text-cream hover:bg-gold/25">Connect</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="relative pt-20 pb-24 md:pt-28 md:pb-32 overflow-hidden z-10">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+            <!-- Hero Logo Icon Badge with Ping Animation -->
+            <div class="relative inline-flex items-center justify-center p-4 bg-gradient-to-b from-cream-light to-cream-dark dark:from-navy-light dark:to-navy rounded-full gold-glow border-2 border-gold mb-8 transform hover:scale-105 transition-transform duration-300 ring-4 ring-gold/35">
+                <div class="absolute inset-0 rounded-full border-2 border-gold/50 animate-ping pointer-events-none"></div>
+                <div class="w-28 h-28 sm:w-36 sm:h-36 rounded-full bg-navy flex items-center justify-center text-gold shadow-inner overflow-hidden border-2 border-gold-light relative z-10">
+                    <img src="logo.jpg" alt="Logo" class="w-full h-full object-cover rounded-full relative z-10" onerror="this.src='https://placehold.co/300x300/101622/D4A034?text=SC';">
+                </div>
+            </div>
+
+            <!-- Main Heading -->
+            <h1 class="text-4xl sm:text-6xl font-bold text-navy dark:text-cream tracking-tight mb-4">
+                The Scholar's Circle
+            </h1>
+
+            <!-- Ornate Gold Divider -->
+            <div class="flex items-center justify-center gap-3 mb-5">
+                <span class="h-0.5 w-16 bg-gradient-to-r from-transparent via-gold to-gold-dark rounded-full"></span>
+                <i class="fa-solid fa-diamond text-gold text-xs"></i>
+                <i class="fa-solid fa-crown text-gold text-base"></i>
+                <i class="fa-solid fa-diamond text-gold text-xs"></i>
+                <span class="h-0.5 w-16 bg-gradient-to-l from-transparent via-gold to-gold-dark rounded-full"></span>
+            </div>
+
+            <!-- Motto Subtitle Pill -->
+            <div class="inline-block px-6 py-2 rounded-full bg-gold/25 dark:bg-gold/15 border-2 border-gold mb-9 shadow-sm">
+                <p class="text-base sm:text-xl font-bold text-navy dark:text-gold-light tracking-wider uppercase">
+                    One Team, One Dream, Zero Limits
+                </p>
+            </div>
+
+            <!-- 3 CTA Buttons -->
+            <div class="flex flex-col sm:flex-row flex-wrap items-center justify-center gap-4">
+                <a href="#captain-note" class="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-navy text-gold-light font-bold shadow-lg hover:bg-navy-light transition-all transform hover:-translate-y-0.5 border-2 border-gold ring-2 ring-gold/25">
+                    Read Captain's Note <i class="fa-solid fa-arrow-down ml-2 text-xs text-gold"></i>
+                </a>
+                <a href="#cocaptain-note" class="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-gradient-to-r from-gold-dark via-gold to-gold-light text-navy font-bold shadow-lg gold-glow hover:brightness-105 transition-all transform hover:-translate-y-0.5 border-2 border-navy/30">
+                    Read Co-Captain's Note <i class="fa-solid fa-arrow-down ml-2 text-xs text-navy"></i>
+                </a>
+                <a href="#members" class="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-cream-light dark:bg-navy-light text-navy dark:text-cream border-2 border-gold font-bold shadow-md hover:bg-gold/30 transition-all transform hover:-translate-y-0.5">
+                    Meet The Team <i class="fa-solid fa-users ml-2 text-xs text-gold-dark dark:text-gold"></i>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- About Section -->
+    <section id="about" class="py-20 bg-cream-light dark:bg-navy-light border-y-4 border-gold relative z-10">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-xs font-bold uppercase tracking-wider text-navy dark:text-gold-light bg-gold/35 dark:bg-gold/20 px-4 py-1.5 rounded-full border-2 border-gold shadow-sm">
+                    <i class="fa-solid fa-sparkles text-gold-dark dark:text-gold mr-1"></i> About Our Circle
+                </span>
+                <h2 class="text-3xl sm:text-4xl font-bold text-navy dark:text-cream mt-4 tracking-tight">More Than Just a Study Group</h2>
+                <div class="flex items-center justify-center gap-2 mt-3">
+                    <span class="w-12 h-1 bg-gold rounded-full"></span>
+                    <span class="w-3 h-3 rotate-45 bg-gold"></span>
+                    <span class="w-12 h-1 bg-gold rounded-full"></span>
+                </div>
+                <p class="text-navy/85 dark:text-cream/85 mt-4 text-base sm:text-lg leading-relaxed font-semibold">We started The Scholar's Circle because studying alone gets tough, but studying with the right people makes all the difference. Whether we're clearing late-night doubts, sharing notes, or pushing each other before exams, we're here to grow together.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                <!-- Founded Date Card -->
+                <div class="bg-cream dark:bg-navy p-8 rounded-2xl border-2 border-gold gold-glow hover:shadow-xl transition-all relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-gold-dark via-gold-light to-gold-dark"></div>
+                    <div class="w-12 h-12 rounded-xl bg-navy text-gold-light flex items-center justify-center mb-6 text-xl border-2 border-gold ring-2 ring-gold/30 shadow-sm">
+                        <i class="fa-solid fa-calendar-days"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-navy dark:text-cream mb-2">When We Started</h3>
+                    <p class="text-navy/85 dark:text-cream/85 text-sm leading-relaxed font-semibold">Created on <strong class="text-gold-dark dark:text-gold-light font-bold underline decoration-gold decoration-2">20/10/2026</strong>. What started as a simple group chat for friends quickly became our daily space to stay consistent and focused on our goals.</p>
+                </div>
+
+                <!-- Core Motto Card -->
+                <div class="bg-cream dark:bg-navy p-8 rounded-2xl border-2 border-gold gold-glow hover:shadow-xl transition-all relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-gold-dark via-gold-light to-gold-dark"></div>
+                    <div class="w-12 h-12 rounded-xl bg-navy text-gold-light flex items-center justify-center mb-6 text-xl border-2 border-gold ring-2 ring-gold/30 shadow-sm">
+                        <i class="fa-solid fa-bullseye"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-navy dark:text-cream mb-2">What We Believe In</h3>
+                    <p class="text-navy/85 dark:text-cream/85 text-sm leading-relaxed font-semibold"><strong class="text-gold-dark dark:text-gold-light font-bold">"One Team, One Dream, Zero Limits."</strong> Nobody gets left behind here—when one of us is stuck on a topic, the rest of the circle steps in to help.</p>
+                </div>
+            </div>
+
+            <!-- Code of Conduct / GC Rules -->
+            <div class="mt-12 max-w-4xl mx-auto bg-cream dark:bg-navy rounded-2xl p-8 sm:p-10 border-2 border-gold gold-glow relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-navy via-gold to-navy"></div>
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 mb-8 border-b-2 border-gold">
+                    <div class="flex items-center space-x-3.5">
+                        <div class="w-11 h-11 rounded-xl bg-navy text-gold-light flex items-center justify-center text-lg shadow-sm shrink-0 border-2 border-gold ring-2 ring-gold/30">
+                            <i class="fa-solid fa-scale-balanced"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-navy dark:text-cream">Group Chat Rules</h3>
+                            <p class="text-xs text-gold-dark dark:text-gold font-bold">How we keep the GC helpful for everyone</p>
+                        </div>
+                    </div>
+                    <span class="inline-flex items-center self-start sm:self-auto px-4 py-1.5 rounded-full text-xs font-bold bg-navy text-gold-light border-2 border-gold shadow-sm">
+                        <i class="fa-solid fa-crown mr-1.5 text-gold"></i> For All Members
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Rule 1 -->
+                    <div class="flex items-start space-x-3.5 bg-cream-light dark:bg-navy-light p-4 rounded-xl border-2 border-gold/80 shadow-sm">
+                        <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-gold-light to-gold-dark text-navy font-bold text-xs flex items-center justify-center shrink-0 mt-0.5 border border-navy/20 shadow-sm">01</span>
+                        <div>
+                            <h4 class="text-sm font-bold text-navy dark:text-cream">Keep It About Studies</h4>
+                            <p class="text-xs text-navy/85 dark:text-cream/80 mt-1 leading-relaxed font-semibold">Use the chat for doubts, notes, exam updates, and study plans. Avoid random forwards or spam that bury important messages.</p>
+                        </div>
+                    </div>
+
+                    <!-- Rule 2 -->
+                    <div class="flex items-start space-x-3.5 bg-cream-light dark:bg-navy-light p-4 rounded-xl border-2 border-gold/80 shadow-sm">
+                        <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-gold-light to-gold-dark text-navy font-bold text-xs flex items-center justify-center shrink-0 mt-0.5 border border-navy/20 shadow-sm">02</span>
+                        <div>
+                            <h4 class="text-sm font-bold text-navy dark:text-cream">Help Each Other Out</h4>
+                            <p class="text-xs text-navy/85 dark:text-cream/80 mt-1 leading-relaxed font-semibold">No doubt is ever "too basic." Be respectful, explain concepts patiently, and back each other up without judgment.</p>
+                        </div>
+                    </div>
+
+                    <!-- Rule 3 -->
+                    <div class="flex items-start space-x-3.5 bg-cream-light dark:bg-navy-light p-4 rounded-xl border-2 border-gold/80 shadow-sm">
+                        <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-gold-light to-gold-dark text-navy font-bold text-xs flex items-center justify-center shrink-0 mt-0.5 border border-navy/20 shadow-sm">03</span>
+                        <div>
+                            <h4 class="text-sm font-bold text-navy dark:text-cream">Be Active, Not a Silent Reader</h4>
+                            <p class="text-xs text-navy/85 dark:text-cream/80 mt-1 leading-relaxed font-semibold">Join in on daily study targets, share what you're revising, and answer questions whenever you know the topic.</p>
+                        </div>
+                    </div>
+
+                    <!-- Rule 4 -->
+                    <div class="flex items-start space-x-3.5 bg-cream-light dark:bg-navy-light p-4 rounded-xl border-2 border-gold/80 shadow-sm">
+                        <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-gold-light to-gold-dark text-navy font-bold text-xs flex items-center justify-center shrink-0 mt-0.5 border border-navy/20 shadow-sm">04</span>
+                        <div>
+                            <h4 class="text-sm font-bold text-navy dark:text-cream">Stick to the Group Schedule</h4>
+                            <p class="text-xs text-navy/85 dark:text-cream/80 mt-1 leading-relaxed font-semibold">Cooperate with Zubair, Amit, and Rajdeep when study timings or group check-ins are announced.</p>
+                        </div>
+                    </div>
+
+                    <!-- Rule 5 -->
+                    <div class="flex items-start space-x-3.5 bg-cream-light dark:bg-navy-light p-4 rounded-xl border-2 border-gold/80 shadow-sm">
+                        <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-gold-light to-gold-dark text-navy font-bold text-xs flex items-center justify-center shrink-0 mt-0.5 border border-navy/20 shadow-sm">05</span>
+                        <div>
+                            <h4 class="text-sm font-bold text-navy dark:text-cream">Name Your Notes & PDFs</h4>
+                            <p class="text-xs text-navy/85 dark:text-cream/80 mt-1 leading-relaxed font-semibold">Whenever you send photos of notes or PDFs, add the subject or chapter name so everyone can find it easily before exams.</p>
+                        </div>
+                    </div>
+
+                    <!-- Rule 6 -->
+                    <div class="flex items-start space-x-3.5 bg-cream-light dark:bg-navy-light p-4 rounded-xl border-2 border-gold/80 shadow-sm">
+                        <span class="w-8 h-8 rounded-lg bg-gradient-to-br from-gold-light to-gold-dark text-navy font-bold text-xs flex items-center justify-center shrink-0 mt-0.5 border border-navy/20 shadow-sm">06</span>
+                        <div>
+                            <h4 class="text-sm font-bold text-navy dark:text-cream">No Off-Topic Chat During Study Hours</h4>
+                            <p class="text-xs text-navy/85 dark:text-cream/80 mt-1 leading-relaxed font-semibold">When people are locked in and studying, keep the chat quiet or strictly study-related. Save casual talk for break times.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Leadership Desks Section (Captain & Co-Captain) -->
+    <section id="captain" class="py-20 bg-cream dark:bg-navy relative z-10">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <span class="text-xs font-bold uppercase tracking-wider text-navy dark:text-gold-light bg-gold/35 dark:bg-gold/20 px-4 py-1.5 rounded-full border-2 border-gold shadow-sm">
+                    <i class="fa-solid fa-feather-pointed text-gold-dark dark:text-gold mr-1"></i> Leadership Address
+                </span>
+                <h2 class="text-3xl font-bold text-navy dark:text-cream mt-4 tracking-tight">From the Leadership Desks</h2>
+                <div class="flex items-center justify-center gap-2 mt-3">
+                    <span class="w-12 h-1 bg-gold rounded-full"></span>
+                    <span class="w-3 h-3 rotate-45 bg-gold"></span>
+                    <span class="w-12 h-1 bg-gold rounded-full"></span>
+                </div>
+            </div>
+
+            <div class="space-y-10">
+                <!-- Captain's Letter Card -->
+                <div id="captain-note" class="scroll-mt-24 bg-cream-light dark:bg-navy-light rounded-2xl p-8 sm:p-12 gold-glow border-2 border-gold relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-3 h-full bg-gradient-to-b from-gold-light via-gold to-gold-dark"></div>
+                    <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-gold-dark via-gold-light to-gold-dark"></div>
+                    
+                    <div class="flex items-center justify-between mb-6 pb-6 border-b-2 border-gold/60">
+                        <div>
+                            <h3 class="text-xl font-bold text-navy dark:text-cream">Zubair Khan</h3>
+                            <p class="text-xs font-bold text-gold-dark dark:text-gold uppercase tracking-wider mt-0.5">Captain & Founder</p>
+                        </div>
+                        <span class="inline-flex items-center px-3.5 py-1 rounded-full text-xs font-bold bg-gold/30 text-navy dark:text-gold-light border border-gold">
+                            <i class="fa-solid fa-crown text-gold-dark dark:text-gold mr-1.5"></i> Captain's Desk
+                        </span>
+                    </div>
+
+                    <!-- Note Body -->
+                    <div class="relative pl-4 sm:pl-6 border-l-4 border-gold my-6 italic text-navy/90 dark:text-cream/90 text-base sm:text-lg leading-relaxed space-y-4 font-semibold">
+                        <p>"Dear Team,</p>
+                        <p>We are not just a study group; we are a team with a mission. Every page we turn, every challenge we face, and every hour we sacrifice is building the future we dream of.</p>
+                        <p>The world may doubt us, but we will let our results speak.</p>
+                        <p>We don't chase greatness. We prepare for it.</p>
+                        <p>Stand united. Stay relentless. Make history."</p>
+                    </div>
+
+                    <div class="mt-8 flex items-center justify-between pt-6 border-t-2 border-gold/60">
+                        <span class="font-bold text-navy dark:text-cream">— Your Captain 🫡🔥</span>
+                        <span class="text-xs text-gold-dark dark:text-gold font-bold">The Scholar's Circle</span>
+                    </div>
+                </div>
+
+                <!-- Co-Captain's Letter Card -->
+                <div id="cocaptain-note" class="scroll-mt-24 bg-cream-light dark:bg-navy-light rounded-2xl p-8 sm:p-12 gold-glow border-2 border-gold relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-3 h-full bg-gradient-to-b from-gold-dark via-gold to-gold-light"></div>
+                    <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-gold-dark via-gold-light to-gold-dark"></div>
+                    
+                    <div class="flex items-center justify-between mb-6 pb-6 border-b-2 border-gold/60">
+                        <div>
+                            <h3 class="text-xl font-bold text-navy dark:text-cream">Amit Borah</h3>
+                            <p class="text-xs font-bold text-gold-dark dark:text-gold uppercase tracking-wider mt-0.5">Co-Captain</p>
+                        </div>
+                        <span class="inline-flex items-center px-3.5 py-1 rounded-full text-xs font-bold bg-gold/30 text-navy dark:text-gold-light border border-gold">
+                            <i class="fa-solid fa-bolt text-gold-dark dark:text-gold mr-1.5"></i> Co-Captain's Desk
+                        </span>
+                    </div>
+
+                    <!-- Note Body -->
+                    <div class="relative pl-4 sm:pl-6 border-l-4 border-gold my-6 italic text-navy/90 dark:text-cream/90 text-base sm:text-lg leading-relaxed space-y-4 font-semibold">
+                        <p>"Hello Scholars,</p>
+                        <p>Behind every successful team is relentless daily consistency. Keeping our focus razor-sharp during study sprints and maintaining our peer support is what sets us apart.</p>
+                        <p>Let's continue to push each other forward, clarify doubts without hesitation, and ensure no member is left behind.</p>
+                        <p>Keep grinding!"</p>
+                    </div>
+
+                    <div class="mt-8 flex items-center justify-between pt-6 border-t-2 border-gold/60">
+                        <span class="font-bold text-navy dark:text-cream">— Amit Borah, Co-Captain ⚡</span>
+                        <span class="text-xs text-gold-dark dark:text-gold font-bold">The Scholar's Circle</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Members' Board Section (Exact Ordered Roster) -->
+    <section id="members" class="py-20 bg-cream-light dark:bg-navy-light border-y-4 border-gold relative z-10">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-16">
+                <span class="text-xs font-bold uppercase tracking-wider text-navy dark:text-gold-light bg-gold/35 dark:bg-gold/20 px-4 py-1.5 rounded-full border-2 border-gold shadow-sm">
+                    <i class="fa-solid fa-users-rays text-gold-dark dark:text-gold mr-1"></i> The Roster
+                </span>
+                <h2 class="text-3xl sm:text-4xl font-bold text-navy dark:text-cream mt-4 tracking-tight">Members' Board</h2>
+                <div class="flex items-center justify-center gap-2 mt-3">
+                    <span class="w-12 h-1 bg-gold rounded-full"></span>
+                    <span class="w-3 h-3 rotate-45 bg-gold"></span>
+                    <span class="w-12 h-1 bg-gold rounded-full"></span>
+                </div>
+                <p class="text-navy/85 dark:text-cream/85 mt-3 text-base font-semibold">The dedicated minds powering The Scholar's Circle in exact order.</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- 1. Zubair Khan -->
+                <div class="bg-cream dark:bg-navy p-6 rounded-2xl border-2 border-gold gold-glow card-aesthetic flex flex-col justify-between relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-gold-dark via-gold-light to-gold-dark"></div>
+                    <div>
+                        <div class="flex items-center justify-between mb-4 mt-1">
+                            <div class="w-14 h-14 rounded-xl bg-navy text-gold-light flex items-center justify-center font-bold text-xl shadow-sm border-2 border-gold ring-2 ring-gold/30">
+                                Z
+                            </div>
+                            <span class="px-3 py-1 text-xs font-bold rounded-full bg-navy text-gold-light border-2 border-gold shadow-sm">
+                                <i class="fa-solid fa-crown text-gold mr-1"></i> Captain
+                            </span>
+                        </div>
+                        <h3 class="text-lg font-bold text-navy dark:text-cream">Zubair Khan</h3>
+                        <p class="text-xs font-bold text-gold-dark dark:text-gold mt-0.5">Group Leader & Visionary</p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t-2 border-gold/60 flex items-center text-xs font-bold text-navy/85 dark:text-cream/85">
+                        <i class="fa-solid fa-shield-halved text-gold-dark dark:text-gold mr-2"></i><span>Command & Direction</span>
+                    </div>
+                </div>
+
+                <!-- 2. Khurshida Aktar -->
+                <div class="bg-cream dark:bg-navy p-6 rounded-2xl border-2 border-gold gold-glow card-aesthetic flex flex-col justify-between relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-gold-dark via-gold-light to-gold-dark"></div>
+                    <div>
+                        <div class="flex items-center justify-between mb-4 mt-1">
+                            <div class="w-14 h-14 rounded-xl bg-rose-700 text-white flex items-center justify-center font-bold text-lg shadow-sm border-2 border-gold">
+                                Kh
+                            </div>
+                            <span class="px-3 py-1 text-xs font-bold rounded-full bg-gold/35 text-navy dark:text-gold-light border-2 border-gold">
+                                <i class="fa-solid fa-award text-gold-dark dark:text-gold mr-1"></i> Academic Lead
+                            </span>
+                        </div>
+                        <h3 class="text-lg font-bold text-navy dark:text-cream">Khurshida Aktar</h3>
+                        <p class="text-xs font-bold text-gold-dark dark:text-gold mt-0.5">Girls' Academic Lead</p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t-2 border-gold/60 flex items-center text-xs font-bold text-navy/85 dark:text-cream/85">
+                        <i class="fa-solid fa-book-open-reader text-gold-dark dark:text-gold mr-2"></i><span>Guidance & Strategy</span>
+                    </div>
+                </div>
+
+                <!-- 3. Amit Borah -->
+                <div class="bg-cream dark:bg-navy p-6 rounded-2xl border-2 border-gold gold-glow card-aesthetic flex flex-col justify-between relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-gold-dark via-gold-light to-gold-dark"></div>
+                    <div>
+                        <div class="flex items-center justify-between mb-4 mt-1">
+                            <div class="w-14 h-14 rounded-xl bg-navy-light text-gold-light flex items-center justify-center font-bold text-xl shadow-sm border-2 border-gold ring-2 ring-gold/30">
+                                A
+                            </div>
+                            <span class="px-3 py-1 text-xs font-bold rounded-full bg-gold/35 text-navy dark:text-gold-light border-2 border-gold">
+                                <i class="fa-solid fa-bolt text-gold-dark dark:text-gold mr-1"></i> Co-Captain
+                            </span>
+                        </div>
+                        <h3 class="text-lg font-bold text-navy dark:text-cream">Amit Borah</h3>
+                        <p class="text-xs font-bold text-gold-dark dark:text-gold mt-0.5">Second in Command</p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t-2 border-gold/60 flex items-center text-xs font-bold text-navy/85 dark:text-cream/85">
+                        <i class="fa-solid fa-user-tie text-gold-dark dark:text-gold mr-2"></i><span>Operations & Support</span>
+                    </div>
+                </div>
+
+                <!-- 4. Omme Shahima -->
+                <div class="bg-cream dark:bg-navy p-6 rounded-2xl border-2 border-gold gold-glow card-aesthetic flex flex-col justify-between relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-gold-dark via-gold-light to-gold-dark"></div>
+                    <div>
+                        <div class="flex items-center justify-between mb-4 mt-1">
+                            <div class="w-14 h-14 rounded-xl bg-teal-700 text-white flex items-center justify-center font-bold text-xl shadow-sm border-2 border-gold">
+                                O
+                            </div>
+                            <span class="px-3 py-1 text-xs font-bold rounded-full bg-gold/30 text-navy dark:text-gold-light border border-gold">Learner</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-navy dark:text-cream">Omme Shahima</h3>
+                        <p class="text-xs font-bold text-gold-dark dark:text-gold mt-0.5">Dedicated Learner</p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t-2 border-gold/60 flex items-center text-xs font-bold text-navy/85 dark:text-cream/85">
+                        <i class="fa-solid fa-graduation-cap text-gold-dark dark:text-gold mr-2"></i><span>Active Participation</span>
+                    </div>
+                </div>
+
+                <!-- 5. Rajdeep Das -->
+                <div class="bg-cream dark:bg-navy p-6 rounded-2xl border-2 border-gold gold-glow card-aesthetic flex flex-col justify-between relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-gold-dark via-gold-light to-gold-dark"></div>
+                    <div>
+                        <div class="flex items-center justify-between mb-4 mt-1">
+                            <div class="w-14 h-14 rounded-xl bg-emerald-700 text-white flex items-center justify-center font-bold text-xl shadow-sm border-2 border-gold">
+                                R
+                            </div>
+                            <span class="px-3 py-1 text-xs font-bold rounded-full bg-gold/30 text-navy dark:text-gold-light border border-gold">Group Manager</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-navy dark:text-cream">Rajdeep Das</h3>
+                        <p class="text-xs font-bold text-gold-dark dark:text-gold mt-0.5">Administration & Order</p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t-2 border-gold/60 flex items-center text-xs font-bold text-navy/85 dark:text-cream/85">
+                        <i class="fa-solid fa-sliders text-gold-dark dark:text-gold mr-2"></i><span>Group Coordination</span>
+                    </div>
+                </div>
+
+                <!-- 6. Kabyam Kalita -->
+                <div class="bg-cream dark:bg-navy p-6 rounded-2xl border-2 border-gold gold-glow card-aesthetic flex flex-col justify-between relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-gold-dark via-gold-light to-gold-dark"></div>
+                    <div>
+                        <div class="flex items-center justify-between mb-4 mt-1">
+                            <div class="w-14 h-14 rounded-xl bg-amber-700 text-white flex items-center justify-center font-bold text-xl shadow-sm border-2 border-gold">
+                                K
+                            </div>
+                            <span class="px-3 py-1 text-xs font-bold rounded-full bg-gold/30 text-navy dark:text-gold-light border border-gold">Lead Scholar</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-navy dark:text-cream">Kabyam Kalita</h3>
+                        <p class="text-xs font-bold text-gold-dark dark:text-gold mt-0.5">Academic Lead</p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t-2 border-gold/60 flex items-center text-xs font-bold text-navy/85 dark:text-cream/85">
+                        <i class="fa-solid fa-book-open text-gold-dark dark:text-gold mr-2"></i><span>Study Strategy & Pacing</span>
+                    </div>
+                </div>
+
+                <!-- 7. Partha J. Das -->
+                <div class="bg-cream dark:bg-navy p-6 rounded-2xl border-2 border-gold gold-glow card-aesthetic flex flex-col justify-between relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-gold-dark via-gold-light to-gold-dark"></div>
+                    <div>
+                        <div class="flex items-center justify-between mb-4 mt-1">
+                            <div class="w-14 h-14 rounded-xl bg-purple-700 text-white flex items-center justify-center font-bold text-xl shadow-sm border-2 border-gold">
+                                P
+                            </div>
+                            <span class="px-3 py-1 text-xs font-bold rounded-full bg-gold/30 text-navy dark:text-gold-light border border-gold">Learner</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-navy dark:text-cream">Partha J. Das</h3>
+                        <p class="text-xs font-bold text-gold-dark dark:text-gold mt-0.5">Dedicated Learner</p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t-2 border-gold/60 flex items-center text-xs font-bold text-navy/85 dark:text-cream/85">
+                        <i class="fa-solid fa-graduation-cap text-gold-dark dark:text-gold mr-2"></i><span>Active Participation</span>
+                    </div>
+                </div>
+
+                <!-- 8. Sheikh Tasnim Sultana -->
+                <div class="bg-cream dark:bg-navy p-6 rounded-2xl border-2 border-gold gold-glow card-aesthetic flex flex-col justify-between relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-gold-dark via-gold-light to-gold-dark"></div>
+                    <div>
+                        <div class="flex items-center justify-between mb-4 mt-1">
+                            <div class="w-14 h-14 rounded-xl bg-cyan-700 text-white flex items-center justify-center font-bold text-xl shadow-sm border-2 border-gold">
+                                T
+                            </div>
+                            <span class="px-3 py-1 text-xs font-bold rounded-full bg-gold/30 text-navy dark:text-gold-light border border-gold">Notes Provider</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-navy dark:text-cream">Sheikh Tasnim Sultana</h3>
+                        <p class="text-xs font-bold text-gold-dark dark:text-gold mt-0.5">Study Material Specialist</p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t-2 border-gold/60 flex items-center text-xs font-bold text-navy/85 dark:text-cream/85">
+                        <i class="fa-solid fa-file-lines text-gold-dark dark:text-gold mr-2"></i><span>Notes & Resources</span>
+                    </div>
+                </div>
+
+                <!-- 9. Mikhail Hussain -->
+                <div class="bg-cream dark:bg-navy p-6 rounded-2xl border-2 border-gold gold-glow card-aesthetic flex flex-col justify-between relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-gold-dark via-gold-light to-gold-dark"></div>
+                    <div>
+                        <div class="flex items-center justify-between mb-4 mt-1">
+                            <div class="w-14 h-14 rounded-xl bg-indigo-700 text-white flex items-center justify-center font-bold text-xl shadow-sm border-2 border-gold">
+                                M
+                            </div>
+                            <span class="px-3 py-1 text-xs font-bold rounded-full bg-gold/30 text-navy dark:text-gold-light border border-gold">Notes Provider</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-navy dark:text-cream">Mikhail Hussain</h3>
+                        <p class="text-xs font-bold text-gold-dark dark:text-gold mt-0.5">Study Material Specialist</p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t-2 border-gold/60 flex items-center text-xs font-bold text-navy/85 dark:text-cream/85">
+                        <i class="fa-solid fa-file-lines text-gold-dark dark:text-gold mr-2"></i><span>Notes & Resources</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Social / Contact Section -->
+    <section id="contact" class="py-20 bg-cream dark:bg-navy relative z-10">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <span class="text-xs font-bold uppercase tracking-wider text-navy dark:text-gold-light bg-gold/35 dark:bg-gold/20 px-4 py-1.5 rounded-full border-2 border-gold shadow-sm">Get Connected</span>
+            <h2 class="text-3xl font-bold text-navy dark:text-cream mt-4 tracking-tight">Join Our Study Circle</h2>
+            <div class="flex items-center justify-center gap-2 mt-3">
+                <span class="w-12 h-1 bg-gold rounded-full"></span>
+                <span class="w-3 h-3 rotate-45 bg-gold"></span>
+                <span class="w-12 h-1 bg-gold rounded-full"></span>
+            </div>
+            <p class="text-navy/85 dark:text-cream/85 mt-4 max-w-xl mx-auto text-base font-semibold">Connect with us on our active WhatsApp group chat to stay up to date with daily study sessions, notes, and discussions.</p>
+
+            <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="https://chat.whatsapp.com/KqzwHRj7e3hBOY02vjfV3m" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 rounded-xl bg-emerald-600 text-white font-bold shadow-lg gold-glow hover:bg-emerald-700 transition-all transform hover:-translate-y-0.5 border-2 border-gold ring-2 ring-gold/30">
+                    <i class="fa-brands fa-whatsapp text-xl mr-3"></i> WhatsApp Group Chat
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-navy text-cream border-t-4 border-gold pt-16 pb-12 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-10 pb-12 border-b-2 border-gold/50">
+                <!-- Brand Info Column -->
+                <div class="md:col-span-2 space-y-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-full bg-navy-light flex items-center justify-center text-gold border-2 border-gold overflow-hidden relative">
+                            <img src="logo.jpg" alt="Logo" class="w-full h-full object-cover rounded-full" onerror="this.src='https://placehold.co/100x100/101622/D4A034?text=SC';">
+                        </div>
+                        <span class="font-bold text-lg text-cream tracking-tight">The Scholar's Circle</span>
+                    </div>
+                    <p class="text-sm text-cream/80 max-w-sm leading-relaxed font-medium">
+                        Established on <span class="text-gold-light font-bold">20/10/2026</span>. A dedicated student circle built on consistency, mutual help, and shared ambition.
+                    </p>
+                </div>
+
+                <!-- Quick Navigation -->
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-gold-light mb-4">Quick Links</h4>
+                    <ul class="space-y-2.5 text-sm font-semibold">
+                        <li><a href="#about" class="text-cream/75 hover:text-gold-light transition-colors">About Us & Rules</a></li>
+                        <li><a href="#captain" class="text-cream/75 hover:text-gold-light transition-colors">Leadership Desks</a></li>
+                        <li><a href="#members" class="text-cream/75 hover:text-gold-light transition-colors">Members' Board</a></li>
+                        <li><a href="#contact" class="text-cream/75 hover:text-gold-light transition-colors">Connect / GC</a></li>
+                    </ul>
+                </div>
+
+                <!-- Connect Column -->
+                <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-gold-light mb-4">Leadership</h4>
+                    <p class="text-sm text-cream/80 mb-3 font-semibold">Led by Zubair, Amit</p>
+                    <div class="flex items-center space-x-3 text-cream/70">
+                        <div class="w-8 h-8 rounded-lg bg-navy-light border-2 border-gold flex items-center justify-center overflow-hidden">
+                            <img src="logo.jpg" alt="Zubair" class="w-full h-full object-cover rounded-md" onerror="this.src='https://placehold.co/100x100/101622/D4A034?text=Z';">
+                        </div>
+                        <div class="w-8 h-8 rounded-lg bg-navy-light border-2 border-gold flex items-center justify-center overflow-hidden">
+                            <img src="logo.jpg" alt="Amit" class="w-full h-full object-cover rounded-md" onerror="this.src='https://placehold.co/100x100/101622/D4A034?text=A';">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Bar -->
+            <div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-cream/70 font-semibold">
+                <p>&copy; 2026 The Scholar's Circle. Led by Zubair, Amit. All rights reserved.</p>
+                <div class="flex items-center space-x-6">
+                    <span class="text-gold-light font-bold">One Team, One Dream, Zero Limits 🫡🔥</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts: Mobile Menu & Bulletproof Theme Toggle -->
+    <script>
+        // Intro Animation Cleanup Logic
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                const introScreen = document.getElementById('intro-screen');
+                if (introScreen) {
+                    introScreen.style.display = 'none';
+                }
+            }, 3800);
+        });
+
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+
+        btn.addEventListener('click', () => {
+            menu.classList.toggle('hidden');
+        });
+
+        const mobileLinks = menu.querySelectorAll('a');
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                menu.classList.add('hidden');
+            });
+        });
+
+        // Theme Toggle Logic
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeToggleMobileBtn = document.getElementById('theme-toggle-mobile');
+        const themeIcon = document.getElementById('theme-icon');
+        const themeIconMobile = document.getElementById('theme-icon-mobile');
+        const htmlElement = document.documentElement;
+
+        // Check local storage on load
+        if (localStorage.getItem('theme') === 'dark') {
+            htmlElement.classList.add('dark');
+            if(themeIcon) themeIcon.className = 'fa-solid fa-sun';
+            if(themeIconMobile) themeIconMobile.className = 'fa-solid fa-sun';
+        } else {
+            htmlElement.classList.remove('dark');
+            if(themeIcon) themeIcon.className = 'fa-solid fa-moon';
+            if(themeIconMobile) themeIconMobile.className = 'fa-solid fa-moon';
+        }
+
+        function toggleTheme() {
+            if (htmlElement.classList.contains('dark')) {
+                htmlElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+                if(themeIcon) themeIcon.className = 'fa-solid fa-moon';
+                if(themeIconMobile) themeIconMobile.className = 'fa-solid fa-moon';
+            } else {
+                htmlElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+                if(themeIcon) themeIcon.className = 'fa-solid fa-sun';
+                if(themeIconMobile) themeIconMobile.className = 'fa-solid fa-sun';
+            }
+        }
+
+        if(themeToggleBtn) {
+            themeToggleBtn.addEventListener('click', toggleTheme);
+        }
+        if(themeToggleMobileBtn) {
+            themeToggleMobileBtn.addEventListener('click', toggleTheme);
+        }
+    </script>
+</body>
+</html>
